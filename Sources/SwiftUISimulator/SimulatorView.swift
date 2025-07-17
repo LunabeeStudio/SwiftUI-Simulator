@@ -9,9 +9,6 @@ import Defaults
 import SwiftPrettyPrint
 import SwiftUI
 import SwiftUICommon
-import UserDefaultsBrowser
-
-internal let storageKeyPrefix = "YusukeHosonuma/SwiftUI-Simulator"
 
 public struct SimulatorAccentColor: EnvironmentKey {
     public static var defaultValue: Color = .defaultSimulatorAccent
@@ -58,7 +55,6 @@ public extension SimulatorView {
         defaultCalendarIdentifiers userCalendarIdentifiers: Set<Calendar.Identifier>? = nil,
         defaultTimeZones userTimeZones: Set<TimeZones>? = nil,
         accentColorName: String = "AccentColor",
-        userDefaultsSuiteNames: [String] = [],
         @ViewBuilder debugMenu: @escaping () -> DebugMenu,
         @ViewBuilder content: @escaping () -> Content
     ) {
@@ -83,8 +79,6 @@ public extension SimulatorView {
             accentColorLight = nil
             accentColorDark = nil
         }
-
-        self.userDefaultsSuiteNames = userDefaultsSuiteNames
 
         //
         // 💡 The following priority order.
@@ -169,7 +163,6 @@ public struct SimulatorView<Content: View, DebugMenu: View>: View {
     // Sheets
     //
     @State private var isPresentedSettingSheet = false
-    @State private var isPresentedUserDefaultsSheet = false
 
     //
     // Environments
@@ -194,7 +187,6 @@ public struct SimulatorView<Content: View, DebugMenu: View>: View {
     private let defaultTimeZones: Set<TimeZones>
     private let accentColorLight: Color?
     private let accentColorDark: Color?
-    private let userDefaultsSuiteNames: [String]
 
     public var body: some View {
         VStack {
@@ -207,16 +199,6 @@ public struct SimulatorView<Content: View, DebugMenu: View>: View {
                     simulatorIcon()
                 }
             }
-        }
-        //
-        // 􀤄 UserDefaults
-        //
-        .fullScreenCover(isPresented: $isPresentedUserDefaultsSheet) {
-            UserDefaultsBrowserView(
-                suiteNames: userDefaultsSuiteNames,
-                excludeKeys: UserDefaults.isOSSKey,
-                accentColor: simulatorAccentColor.rawValue
-            )
         }
         //
         // 􀋲 Settings
@@ -254,17 +236,6 @@ public struct SimulatorView<Content: View, DebugMenu: View>: View {
                 } label: {
                     Label("Enable Simulator", systemImage: "power")
                 }
-
-                Divider() // --------
-
-                //
-                // 􀤄 UserDefaults
-                //
-                Button {
-                    isPresentedUserDefaultsSheet.toggle()
-                } label: {
-                    Label("UserDefaults", systemImage: "opticaldiscdrive")
-                }
             } label: {
                 //
                 // 􀪏
@@ -297,18 +268,6 @@ public struct SimulatorView<Content: View, DebugMenu: View>: View {
                     isPresentedSettingSheet.toggle()
                 } label: {
                     Label("Settings", systemImage: "gear")
-                }
-                Divider() // --------
-            }
-
-            //
-            // 􀤄 UserDefaults
-            //
-            Group {
-                Button {
-                    isPresentedUserDefaultsSheet.toggle()
-                } label: {
-                    Label("UserDefaults", systemImage: "opticaldiscdrive")
                 }
                 Divider() // --------
             }
